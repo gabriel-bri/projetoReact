@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import axios from 'axios';
 
 function App() {
 
@@ -9,14 +8,26 @@ function App() {
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=f15aa2735ef18205e13328a37fb7d0c3`;
 
   const searchLocation = (event) => {
-    if(event.key === 'Enter') {
-      axios.get(url).then((response) => {
-        setData(response.data);
-        console.log(response);
-      })
-      setLocation('');
+    if (event.key === 'Enter') {
+      fetch(url)        
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Falha na requisição');
+          }
+          return response.json();
+        })
+        
+        .then((data) => {
+          setData(data);
+          console.log(data);
+        })
+        
+        .catch((error) => {
+          console.error(error);
+        });
+        setLocation('');
     }
-  }
+  };
   
   return (
     <div className="app">
@@ -44,6 +55,9 @@ function App() {
           </div>
 
         </div>
+
+        {data.name !== undefined &&
+
         <div className='bottom'>
           <div className='feels'>
             {data.main ? <p className='bold'>{data.main.feels_like.toFixed()}ºC</p> : null}
@@ -60,6 +74,7 @@ function App() {
             <p>Velocidade do vento</p>
           </div>
         </div>
+      }
       </div>
     </div>
   );
